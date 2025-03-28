@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const [gemData, itemData] = await Promise.all([
             loadCSV('gem.csv'),
-            loadCSV('item.csv')
+            loadCSV('event.csv')
         ]);
 
         const mergedData = mergeData(gemData, itemData);
@@ -52,10 +52,10 @@ function mergeData(gemData, itemData) {
     const merged = {};
     
     Object.keys(gemData).forEach(name => {
-        if (itemData[name]) {
+        if (eventData[name]) {
             merged[name] = {
                 gemValues: gemData[name],
-                itemValue: itemData[name][0]
+                eventValue: eventData[name][0]
             };
         }
     });
