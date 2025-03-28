@@ -1,96 +1,21 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>アイテム交換計算機</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        input { width: 80px; text-align: right; }
-        .ratio { color: #2c3e50; font-weight: bold; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アイテム価値計算ツール</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>アイテム交換計算機</h1>
-    <table id="resultTable">
-        <thead>
-            <tr>
-                <th>アイテム名</th>
-                <th>Gem価格</th>
-                <th>Item価格</th>
-                <th>お得度</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <script>
-        // ローカルストレージからデータを読み込む
-        const loadSavedData = () => {
-            const saved = localStorage.getItem('gemData');
-            return saved ? JSON.parse(saved) : {};
-        };
-
-        // CSVファイルを読み込む関数
-        const loadCSV = async (filename) => {
-            const response = await fetch(filename);
-            const text = await response.text();
-            return text.split('\n').reduce((acc, line) => {
-                const [key, value] = line.trim().split('\t');
-                if (key && value) acc[key] = Number(value);
-                return acc;
-            }, {});
-        };
-
-        // 計算と表示のメイン関数
-        const initializeApp = async () => {
-            const [gemData, itemData] = await Promise.all([
-                loadCSV('gem.csv'),
-                loadCSV('item.csv')
-            ]);
-
-            const savedData = loadSavedData();
-            const mergedGemData = { ...gemData, ...savedData };
-
-            const tbody = document.querySelector('#resultTable tbody');
-            tbody.innerHTML = '';
-
-            Object.entries(mergedGemData).forEach(([itemName, gemValue]) => {
-                const itemValue = itemData[itemName] || 0;
-                const ratio = itemValue ? (gemValue / itemValue).toFixed(2) : 'N/A';
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${itemName}</td>
-                    <td>
-                        <input type="number" value="${gemValue}" 
-                               data-item="${itemName}"
-                               onchange="updateValue(this)">
-                    </td>
-                    <td>${itemValue}</td>
-                    <td class="ratio">${ratio}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        };
-
-        // 値更新時の処理
-        window.updateValue = (input) => {
-            const itemName = input.dataset.item;
-            const value = Number(input.value);
-            
-            const savedData = loadSavedData();
-            savedData[itemName] = value;
-            localStorage.setItem('gemData', JSON.stringify(savedData));
-            
-            initializeApp();
-        };
-
-        // 初期化実行
-        initializeApp();
-    </script>
+    <div class="container">
+        <h1>アイテムお得度計算</h1>
+        <div class="input-section">
+            <label for="customValue">基準価値（自分）:</label>
+            <input type="number" id="customValue" value="1000">
+        </div>
+        <div id="tableContainer"></div>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
